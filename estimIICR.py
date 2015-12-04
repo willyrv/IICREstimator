@@ -4,6 +4,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import ConfigParser
+import json
 
 def generate_MS_t2(ms_command):
     # Simulate T2 values using MS.
@@ -99,7 +100,69 @@ def compute_empirical_dist(obs, x_vector='', dx=0):
     pdf_obs_x = np.true_divide(dy, actual_dx)
 
     return (cdf_x, pdf_obs_x)
-    
+
+def compute_t_vector(start, end, number_of_values, vector_type):
+    if vector_type == 'linear':
+        x_vector = np.linspace(start, end, number_of_values)
+    elif vector_type == 'log':
+        n = number_of_values
+        x_vector = [0.1*(np.exp(i * np.log(1+10*end)/n)-1)
+                    for i in range(n+1)]
+        x_vector[0] = x_vector[0]+start
+    else:
+        # For the moment, the default output is a linspace distribution
+        x_vector = np.linspace(start, end, number_of_values)
+    return np.array(x_vector)
+
+def group_t(time_interval, pattern):
+    # Groupes the time following the pattern as specifyed in the psmc
+    # documentation
+    constant_blocks = pattern.split('+')
+    t = list(time_interval)
+    t = t[:]+t[-1:]
+    temp = [t[0]]
+    current_pos = 0
+    for b in constant_blocks:
+        if b.__contains__('*'):
+            n_of_blocks = int(b.split('*')[0])
+            size_of_blocks = int(b.split('*')[1])
+            for i in xrange(n_of_blocks):
+                temp.append(t[current_pos+size_of_blocks])
+                current_pos+=size_of_blocks
+        else:
+            size_of_blocks = int(b)
+            temp.append(t[current_pos+size_of_blocks])
+            current_pos+=size_of_blocks
+    return np.array(temp)
+
+def compute_IICR_n_islands(n, M, t, s=1):
+    # This method evaluates the lambda function in a vector
+    # of time values t.
+    # If 's' is True we are in the case when two individuals where
+    # sampled from the same island. If 's' is false, then the two
+    # individuals where sampled from different islands.
+
+    # Computing constants
+    gamma = np.true_divide(M, n-1)
+    delta = (1+n*gamma)**2 - 4*gamma
+    alpha = 0.5*(1+n*gamma + np.sqrt(delta))
+    beta =  0.5*(1+n*gamma - np.sqrt(delta))
+    c = np.true_divide(gamma, beta-alpha)
+
+    # Now we evaluate
+    x_vector = t
+    if s:
+        numerator = (1-beta)*np.exp(-alpha*x_vector) + (alpha-1)*np.exp(-beta*x_vector)
+        denominator = (alpha-gamma)*np.exp(-alpha*x_vector) + (gamma-beta)*np.exp(-beta*x_vector)
+    else:
+        numerator = beta*np.exp(-alpha*(x_vector)) - alpha*np.exp(-beta*(x_vector))
+        denominator = gamma * (np.exp(-alpha*(x_vector)) - np.exp(-beta*(x_vector)))
+
+    lambda_t = np.true_divide(numerator, denominator)
+
+    return lambda_t
+
+
 class ParamsLoader():
     # We use it for loading the parameters from a file
     def __init__(self, path2params='./parameters.txt'):
@@ -166,18 +229,29 @@ class ParamsLoader():
                 plot_real, plot_limits, n_rep]
 
 if __name__ == "__main__":
-    p = ParamsLoader()
-    ms_full_cmd = os.path.join(p.path2ms, p.ms_command)
-
+    with open('parameters.json') as json_params:
+        p = json.load(json_params)
+    
+    if p["custom_x_vector"]["set_custom_xvector"] == 0:
+            start = p["computation_parameters"]["start"]
+            end = p["computation_parameters"]["end"]
+            number_of_values = p["computation_parameters"]["number_of_values"]
+            vector_type = p["computation_parameters"]["x_vector_type"]
+            t_vector = compute_t_vector(start, end, number_of_values, vector_type)
+    
+    pattern = p["computation_parameters"]["pattern"]
     empirical_histories = []
+    times_vector = group_t(t_vector, pattern)
+    dx = p["computation_parameters"]["dx"]
     # Do n independent simulations     
-    for i in range(p.n_rep):
+    for i in range(len(p["scenarios"])):
+        ms_full_cmd = os.path.join(p["path2ms"], p["scenarios"][i]["ms_command"])
         obs = generate_MS_t2(ms_full_cmd)
         obs = 2*np.array(obs) # Given that in ms time is scaled to 4N0 and 
         # our model scales times to 2N0, we multiply the output of MS by 2.
-        (F_x, f_x) = compute_empirical_dist(obs, p.times_vector, p.dx)
+        (F_x, f_x) = compute_empirical_dist(obs, times_vector, dx)
         F_x = np.array(F_x)
-        x = np.array(p.times_vector)
+        x = times_vector
         empirical_lambda = np.true_divide(len(obs)-F_x, f_x)
         empirical_histories.append((x, empirical_lambda))
     # empirical_lambda = np.true_divide((1-F_x[:-1])*(x[1:]-x[:-1]), 
@@ -187,13 +261,18 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
     
-    for (x, empirical_lambda) in empirical_histories:
+    N0 = p["scale_params"]["N0"]
+    g_time = p["scale_params"]["generation_time"]
+    for i in range(len(empirical_histories)):
+        (x, empirical_lambda) = empirical_histories[i]
         x[0] = float(x[1])/5 # this is for avoiding to have x[0]=0 in a logscale
-        ax.step(2 * p.N0 * p.g_time*x, p.N0 * empirical_lambda, '-r', 
-            where='post', label='empirical lambda from MS')
+        plot_style = p["scenarios"][i]["plot_style"]
+        plot_label = p["scenarios"][i]["label"]
+        ax.step(2 * N0 * g_time*x, N0 * empirical_lambda, plot_style, 
+            where='post', label=plot_label)
     
     # Plot the real history (if commanded)
-    if p.plot_real:
+    if p["plot_params"]["plot_real_ms_history"]:
         [case, x, y] = compute_real_history_from_ms_command(p.ms_command, p.N0)
         print(case)
         print(x)
@@ -203,14 +282,31 @@ if __name__ == "__main__":
         x.append(1e7) # adding the last value 
         y.append(y[-1])
         ax.step(x, y, '-b', where='post', label='Real history')
+        
+    if p["plot_params"]["plot_theor_IICR"]:
+        theoretical_IICR_list = []
+        T_max = np.log10(p["plot_params"]["plot_limits"][1])
+        t_k = np.logspace(1, T_max, 1000)
+        t_k = np.true_divide(t_k, 2 * N0 * g_time)
+        for i in range(len(p["theoretical_IICR_nisland"])):
+            n = p["theoretical_IICR_nisland"][i]["n"]
+            M = p["theoretical_IICR_nisland"][i]["M"]
+            theoretical_IICR_list.append(compute_IICR_n_islands(n, M, t_k, 1))
+            
+    # Plotting the theoretical IICR
+    for i in range(len(p["theoretical_IICR_nisland"])):
+        plot_label = p["theoretical_IICR_nisland"][i]["label"]
+        plot_style = p["theoretical_IICR_nisland"][i]["plot_style"]
+        ax.plot(2 * N0 * g_time * t_k, N0 * theoretical_IICR_list[i], plot_style, label=plot_label)
     
     ax.set_xlabel('Time (in years)')
     ax.set_ylabel(r'Coalescence rates $\lambda(t)$')
     ax.set_xscale('log')
     
     plt.legend(loc='best')
-    plt.xlim(p.plot_limits[0], p.plot_limits[1])
-    plt.ylim(p.plot_limits[2], p.plot_limits[3])
+    [x_a, x_b, y_a, y_b] = p["plot_params"]["plot_limits"]
+    plt.xlim(x_a, x_b)
+    plt.ylim(y_a, y_b)
     plt.show()
     
     #fig.savefig('./plot.png', dpi=300)
