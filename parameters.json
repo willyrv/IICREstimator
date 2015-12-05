@@ -2,28 +2,38 @@
   "path2ms" : "./",
   "scenarios" : [
     {"ms_command":"ms 2 1000000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
-    "label":"first scenario",
-    "plot_style": "-b"
+    "label":"10 islands, sample_size 2",
+    "color": "b",
+    "linestyle": "-",
+    "alpha": 0.5
     },
-    {"ms_command":"ms 2 1000000 -T -L -I 5 2 0 0 0 0 1",
-    "label":"second scenario",
-    "plot_style": "-r"
+    {"ms_command":"ms 3 1000000 -T -L -I 10 3 0 0 0 0 0 0 0 0 0 1",
+    "label":"10 islands, sample_size 3",
+    "color": "r",
+    "linestyle": "-",
+    "alpha": 0.5
     },
-    {"ms_command":"ms 2 1000000 -T -L -I 2 2 0 1",
-    "label":"third scenario",
-    "plot_style": "-g"
+    {"ms_command":"ms 5 10000000 -T -L -I 10 5 0 0 0 0 0 0 0 0 0 1",
+    "label":"10 islands, sample_size 5",
+    "color": "g",
+    "linestyle": "-",
+    "alpha": 0.5
     }
   ],
   "theoretical_IICR_nisland" : [
-    {"n": 2,
+    {"n": 10,
     "M": 1,
-    "label": "theoretical IICR 1",
-    "plot_style": "-k"
+    "label": "theoretical IICR T2 n10M1",
+    "color": "k",
+    "linestyle": "-",
+    "alpha": 0.5    
     },
     {"n": 5,
     "M": 1,
-    "label": "theoretical IICR 2",
-    "plot_style": ":k"
+    "label": "theoretical IICR T2 n5M1",
+    "color": "k",
+    "linestyle": ":",
+    "alpha": 0.5    
     }
   ],
   "computation_parameters" : {

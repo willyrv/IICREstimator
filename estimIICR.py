@@ -5,6 +5,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 import ConfigParser
 import json
+import re
+from scipy import misc
+
+def generate_MS_tk(ms_command):
+    # Simulate T2 values using MS.
+    # The input is a string containing the MS-command
+    # The output is a list of float containing independent values of Tk
+    # where Tk is the first coalescent event of the sample
+    o = os.popen(ms_command).read()
+    newick_re = "\([(0-9.,:)]+\)" # Find the tree line
+    newick_pattern = re.compile(newick_re)
+    single_coal_re = "\([0-9.,:]+\)"
+    single_coal_pattern = re.compile(single_coal_re)
+    t_obs = []
+    for newick_line in newick_pattern.finditer(o):
+        newick_text = newick_line.group()
+        coal_times = []
+        for single_coal_event in single_coal_pattern.finditer(newick_text):
+            matched_text = single_coal_event.group()
+            coal_time = float(matched_text.split(':')[1].split(',')[0])
+            coal_times.append(coal_time)
+        t_obs.append(min(coal_times))
+    return t_obs
 
 def generate_MS_t2(ms_command):
     # Simulate T2 values using MS.
@@ -246,13 +269,22 @@ if __name__ == "__main__":
     # Do n independent simulations     
     for i in range(len(p["scenarios"])):
         ms_full_cmd = os.path.join(p["path2ms"], p["scenarios"][i]["ms_command"])
-        obs = generate_MS_t2(ms_full_cmd)
+        obs = generate_MS_tk(ms_full_cmd)
         obs = 2*np.array(obs) # Given that in ms time is scaled to 4N0 and 
         # our model scales times to 2N0, we multiply the output of MS by 2.
         (F_x, f_x) = compute_empirical_dist(obs, times_vector, dx)
         F_x = np.array(F_x)
         x = times_vector
-        empirical_lambda = np.true_divide(len(obs)-F_x, f_x)
+        # If the sample size on the ms command is greater than 2
+        # the IICR that we obtain when the sample size is 2
+        # must be multiplied by a factor
+        
+        # Parsing the ms command for getting the sample size
+        ms_command = p["scenarios"][i]["ms_command"]
+        sample_size = int(ms_command.split("ms ")[1].split(" ")[0])
+        factor = misc.comb(sample_size, 2)
+        
+        empirical_lambda = factor * np.true_divide(len(obs)-F_x, f_x)
         empirical_histories.append((x, empirical_lambda))
     # empirical_lambda = np.true_divide((1-F_x[:-1])*(x[1:]-x[:-1]), 
     #                                  F_x[1:]-F_x[:-1])
@@ -266,10 +298,12 @@ if __name__ == "__main__":
     for i in range(len(empirical_histories)):
         (x, empirical_lambda) = empirical_histories[i]
         x[0] = float(x[1])/5 # this is for avoiding to have x[0]=0 in a logscale
-        plot_style = p["scenarios"][i]["plot_style"]
+        linecolor = p["scenarios"][i]["color"]
+        line_style = p["scenarios"][i]["linestyle"]
+        alpha = p["scenarios"][i]["alpha"]
         plot_label = p["scenarios"][i]["label"]
-        ax.step(2 * N0 * g_time*x, N0 * empirical_lambda, plot_style, 
-            where='post', label=plot_label)
+        ax.step(2 * N0 * g_time*x, N0 * empirical_lambda, color = linecolor,
+                ls=line_style, where='post', alpha=alpha, label=plot_label)
     
     # Plot the real history (if commanded)
     if p["plot_params"]["plot_real_ms_history"]:
@@ -295,12 +329,15 @@ if __name__ == "__main__":
             
     # Plotting the theoretical IICR
     for i in range(len(p["theoretical_IICR_nisland"])):
+        linecolor = p["theoretical_IICR_nisland"][i]["color"]
+        line_style = p["theoretical_IICR_nisland"][i]["linestyle"]
+        alpha = p["theoretical_IICR_nisland"][i]["alpha"]        
         plot_label = p["theoretical_IICR_nisland"][i]["label"]
-        plot_style = p["theoretical_IICR_nisland"][i]["plot_style"]
-        ax.plot(2 * N0 * g_time * t_k, N0 * theoretical_IICR_list[i], plot_style, label=plot_label)
+        ax.plot(2 * N0 * g_time * t_k, N0 * theoretical_IICR_list[i],
+                color=linecolor, ls=line_style, alpha=alpha, label=plot_label)
     
     ax.set_xlabel('Time (in years)')
-    ax.set_ylabel(r'Coalescence rates $\lambda(t)$')
+    ax.set_ylabel(r'Instantaneous Coalescence rates $\lambda(t)$')
     ax.set_xscale('log')
     
     plt.legend(loc='best')
