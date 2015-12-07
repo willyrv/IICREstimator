@@ -300,10 +300,11 @@ if __name__ == "__main__":
         x[0] = float(x[1])/5 # this is for avoiding to have x[0]=0 in a logscale
         linecolor = p["scenarios"][i]["color"]
         line_style = p["scenarios"][i]["linestyle"]
+        linewidth = p["scenarios"][i]["linewidth"]
         alpha = p["scenarios"][i]["alpha"]
         plot_label = p["scenarios"][i]["label"]
         ax.step(2 * N0 * g_time*x, N0 * empirical_lambda, color = linecolor,
-                ls=line_style, where='post', alpha=alpha, label=plot_label)
+                ls=line_style, linewidth=linewidth, where='post', alpha=alpha, label=plot_label)
     
     # Plot the real history (if commanded)
     if p["plot_params"]["plot_real_ms_history"]:
@@ -331,6 +332,7 @@ if __name__ == "__main__":
     for i in range(len(p["theoretical_IICR_nisland"])):
         linecolor = p["theoretical_IICR_nisland"][i]["color"]
         line_style = p["theoretical_IICR_nisland"][i]["linestyle"]
+        linewidth = p["theoretical_IICR_nisland"][i]["linewidth"]
         alpha = p["theoretical_IICR_nisland"][i]["alpha"]        
         plot_label = p["theoretical_IICR_nisland"][i]["label"]
         ax.plot(2 * N0 * g_time * t_k, N0 * theoretical_IICR_list[i],
