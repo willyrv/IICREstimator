@@ -306,6 +306,10 @@ if __name__ == "__main__":
         ax.step(2 * N0 * g_time*x, N0 * empirical_lambda, color = linecolor,
                 ls=line_style, linewidth=linewidth, where='post', alpha=alpha, label=plot_label)
     
+    # Draw the vertical lines (if specifyed)
+    for vl in p["vertical_lines"]:
+      ax.axvline(vl, color='k', ls='--')
+      
     # Plot the real history (if commanded)
     if p["plot_params"]["plot_real_ms_history"]:
         [case, x, y] = compute_real_history_from_ms_command(p.ms_command, p.N0)
@@ -328,14 +332,14 @@ if __name__ == "__main__":
             M = p["theoretical_IICR_nisland"][i]["M"]
             theoretical_IICR_list.append(compute_IICR_n_islands(n, M, t_k, 1))
             
-    # Plotting the theoretical IICR
-    for i in range(len(p["theoretical_IICR_nisland"])):
-        linecolor = p["theoretical_IICR_nisland"][i]["color"]
-        line_style = p["theoretical_IICR_nisland"][i]["linestyle"]
-        linewidth = p["theoretical_IICR_nisland"][i]["linewidth"]
-        alpha = p["theoretical_IICR_nisland"][i]["alpha"]        
-        plot_label = p["theoretical_IICR_nisland"][i]["label"]
-        ax.plot(2 * N0 * g_time * t_k, N0 * theoretical_IICR_list[i],
+        # Plotting the theoretical IICR
+        for i in range(len(p["theoretical_IICR_nisland"])):
+            linecolor = p["theoretical_IICR_nisland"][i]["color"]
+            line_style = p["theoretical_IICR_nisland"][i]["linestyle"]
+            linewidth = p["theoretical_IICR_nisland"][i]["linewidth"]
+            alpha = p["theoretical_IICR_nisland"][i]["alpha"]        
+            plot_label = p["theoretical_IICR_nisland"][i]["label"]
+            ax.plot(2 * N0 * g_time * t_k, N0 * theoretical_IICR_list[i],
                 color=linecolor, ls=line_style, alpha=alpha, label=plot_label)
     
     ax.set_xlabel('Time (in years)')
