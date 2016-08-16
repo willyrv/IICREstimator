@@ -3,30 +3,9 @@
   "scenarios" : [
     {"ms_command":"ms 2 1000000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
     "label":"10 islands, sample_size 2",
-    "color": "b",
-    "linestyle": "-",
-    "linewidth": 1,
-    "alpha": 0.5
-    },
-    {"ms_command":"ms 3 1000000 -T -L -I 10 3 0 0 0 0 0 0 0 0 0 1",
-    "label":"10 islands, sample_size 3",
-    "color": "r",
-    "linestyle": "-",
-    "linewidth": 1,
-    "alpha": 0.5
-    },
-    {"ms_command":"ms 5 10000000 -T -L -I 10 5 0 0 0 0 0 0 0 0 0 1",
-    "label":"10 islands, sample_size 5",
     "color": "g",
     "linestyle": "-",
     "linewidth": 1,
-    "alpha": 0.5
-    },
-    {"ms_command":"ms 2 1000000 -T -L -I 5 2 0 0 0 0 1",
-    "label":"5 islands, sample_size 2",
-    "color": "y",
-    "linestyle": "-",
-    "linewidth": 3,
     "alpha": 0.5
     }
   ],
@@ -65,11 +44,12 @@
   "generation_time": 25
   },
   "plot_params":{
-  "plot_theor_IICR": 1,
+  "plot_theor_IICR": 0,
   "plot_real_ms_history": 0,
   "plot_limits": [1e2, 1e6, 0, 2e4]
   },
   "number_of_repetitions": {
   "n_rep": 1
-  }
+  },
+  "vertical_lines":[1, 2, 1000, 2000, 5000]
 }
