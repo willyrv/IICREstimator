@@ -357,18 +357,19 @@ if __name__ == "__main__":
     #fig.savefig('./plot.png', dpi=300)
     
     # Plotting the densities
-    if len(p["plot_densities"]["densities_to_plot"])>0:
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        for i in p["plot_densities"]["densities_to_plot"]:
-            l = p["scenarios"][i]["label"]
-            c = p["scenarios"][i]["color"]
-            s = p["scenarios"][i]["linestyle"]
-            a = p["scenarios"][i]["alpha"]
-            ax.step(times_vector, empirical_densities[i], color=c, ls=s, 
-                    alpha = a, label = l)
-        plt.title("Density of T2")
-        plt.xlim(p["plot_densities"]["x_lim"][0], p["plot_densities"]["x_lim"][1])
-        plt.ylim(p["plot_densities"]["y_lim"][0], p["plot_densities"]["y_lim"][1])
-        plt.legend(loc='best')
-        plt.show()
+    if p.has_key("plot_densities"):
+        if len(p["plot_densities"]["densities_to_plot"])>0:
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            for i in p["plot_densities"]["densities_to_plot"]:
+                l = p["scenarios"][i]["label"]
+                c = p["scenarios"][i]["color"]
+                s = p["scenarios"][i]["linestyle"]
+                a = p["scenarios"][i]["alpha"]
+                ax.step(times_vector, empirical_densities[i], color=c, ls=s, 
+                        alpha = a, label = l)
+            plt.title("Density of T2")
+            plt.xlim(p["plot_densities"]["x_lim"][0], p["plot_densities"]["x_lim"][1])
+            plt.ylim(p["plot_densities"]["y_lim"][0], p["plot_densities"]["y_lim"][1])
+            plt.legend(loc='best')
+            plt.show()
