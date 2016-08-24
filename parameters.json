@@ -51,5 +51,10 @@
   "number_of_repetitions": {
   "n_rep": 1
   },
-  "vertical_lines":[1, 2, 1000, 2000, 5000]
+  "vertical_lines":[1, 2, 1000, 2000, 5000],
+  "plot_densities": {
+  "densities_to_plot": [0],
+  "x_lim": [-0.05, 2],
+  "y_lim": [0, 0.5]
+  }
 }

@@ -263,6 +263,7 @@ if __name__ == "__main__":
             t_vector = compute_t_vector(start, end, number_of_values, vector_type)
     
     pattern = p["computation_parameters"]["pattern"]
+    empirical_densities = []
     empirical_histories = []
     times_vector = group_t(t_vector, pattern)
     dx = p["computation_parameters"]["dx"]
@@ -273,6 +274,7 @@ if __name__ == "__main__":
         obs = 2*np.array(obs) # Given that in ms time is scaled to 4N0 and 
         # our model scales times to 2N0, we multiply the output of MS by 2.
         (F_x, f_x) = compute_empirical_dist(obs, times_vector, dx)
+        empirical_densities.append(np.true_divide(np.array(f_x), sum(np.array(f_x))))
         F_x = np.array(F_x)
         x = times_vector
         # If the sample size on the ms command is greater than 2
@@ -353,3 +355,20 @@ if __name__ == "__main__":
     plt.show()
     
     #fig.savefig('./plot.png', dpi=300)
+    
+    # Plotting the densities
+    if len(p["plot_densities"]["densities_to_plot"])>0:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        for i in p["plot_densities"]["densities_to_plot"]:
+            l = p["scenarios"][i]["label"]
+            c = p["scenarios"][i]["color"]
+            s = p["scenarios"][i]["linestyle"]
+            a = p["scenarios"][i]["alpha"]
+            ax.step(times_vector, empirical_densities[i], color=c, ls=s, 
+                    alpha = a, label = l)
+        plt.title("Density of T2")
+        plt.xlim(p["plot_densities"]["x_lim"][0], p["plot_densities"]["x_lim"][1])
+        plt.ylim(p["plot_densities"]["y_lim"][0], p["plot_densities"]["y_lim"][1])
+        plt.legend(loc='best')
+        plt.show()
