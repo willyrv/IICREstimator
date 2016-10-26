@@ -2,8 +2,15 @@
   "path2ms" : "./",
   "scenarios" : [
     {"ms_command":"ms 2 1000000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
-    "label":"10 islands, sample_size 2",
+    "label":"10 islands, sample_size 2, same_island",
     "color": "g",
+    "linestyle": "-",
+    "linewidth": 1,
+    "alpha": 0.5
+    },
+    {"ms_command":"ms 2 1000000 -T -L -I 10 1 1 0 0 0 0 0 0 0 0 1",
+    "label":"10 islands, sample_size 2, different islands",
+    "color": "b",
     "linestyle": "-",
     "linewidth": 1,
     "alpha": 0.5
@@ -12,23 +19,24 @@
   "theoretical_IICR_nisland" : [
     {"n": 10,
     "M": 1,
+    "sampling_same_island": 1,
     "label": "theoretical IICR T2 n10M1",
     "color": "k",
     "linestyle": "-",
     "linewidth": 1,
     "alpha": 0.5    
     },
-    {"n": 5,
+    {"n": 10,
     "M": 1,
+    "sampling_same_island": 0,
     "label": "theoretical IICR T2 n5M1",
     "color": "k",
-    "linestyle": ":",
+    "linestyle": "-",
     "linewidth": 1,
     "alpha": 0.5    
     }
   ],
   "computation_parameters" : {
-    "dx": 0,
     "x_vector_type": "log",
     "start": 0,
     "end": 100,
@@ -44,7 +52,7 @@
   "generation_time": 25
   },
   "plot_params":{
-  "plot_theor_IICR": 0,
+  "plot_theor_IICR": 1,
   "plot_real_ms_history": 0,
   "plot_limits": [1e2, 1e6, 0, 2e4]
   },

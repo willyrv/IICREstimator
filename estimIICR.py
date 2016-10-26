@@ -73,7 +73,7 @@ def compute_real_history_from_ms_command(ms_command, N0):
     else:
         return ('-eN', [[0], [N0]])
 
-def compute_empirical_dist(obs, x_vector='', dx=0):
+def compute_empirical_dist(obs, x_vector=''):
     # This method computes the empirical distribution given the
     # observations.
     # The functions are evaluated in the x_vector parameter
@@ -81,46 +81,33 @@ def compute_empirical_dist(obs, x_vector='', dx=0):
     # by default the differences 'dx' are a vector 
 
     if x_vector == '':
-        actual_x_vector = np.arange(0, max(obs)+0.1, 0.1)
+        actual_x_vector = np.arange(0, max(obs)+0.1, 0.1) 
 
-    elif x_vector[-1]<=max(obs):
+    elif x_vector[-1]<=max(obs): # extend the vector to cover all the data
         actual_x_vector = list(x_vector)
         actual_x_vector.append(max(obs))
         actual_x_vector = np.array(x_vector)
     else:
         actual_x_vector = np.array(x_vector)
         
-    if (dx == 0):
-        dx = actual_x_vector[1:]-actual_x_vector[:-1]
-        # Computes the cumulative distribution and the distribution
-        x_vector_left = actual_x_vector[1:] - np.true_divide(dx,2)
-        x_vector_right = actual_x_vector[1:] + np.true_divide(dx,2)
-        x_vector_left = np.array([0,0] + list(x_vector_left))
-        x_vector_right = np.array([0, actual_x_vector[0]+dx[0]] + list(x_vector_right))
-        actual_dx = np.array([dx[0]]+list(dx))
-    else:
-        actual_dx = dx
-        half_dx = np.true_divide(dx,2)
+    actual_x_vector[0] = 0 # The first element of actual_x_vector should be 0
     
-    counts, ignored_values = np.histogram(obs, bins = actual_x_vector)
-    counts_left, ignored_values = np.histogram(obs, bins = x_vector_left)
-    counts_right, ignored_values = np.histogram(obs, bins = x_vector_right)
+    half_dx = np.true_divide(actual_x_vector[1:]-actual_x_vector[:-1], 2)
+    # Computes the cumulative distribution and the distribution
+    x_vector_shift = actual_x_vector[:-1] + half_dx
+    x_vector_shift = np.array([0] + list(x_vector_shift) + 
+                                [actual_x_vector[-1]+half_dx[-1]])
+    
+    counts = np.histogram(obs, bins = actual_x_vector)[0]
+    counts_shift = np.histogram(obs, bins = x_vector_shift)[0]
     
     cdf_x = counts.cumsum()
     cdf_x = np.array([0]+list(cdf_x))
-    cdf_left = counts_left.cumsum()
-    cdf_right = counts_right.cumsum()
     
-    """
-    # Normalizing
-    cdf_obs_x = np.true_divide(cdf_x,len(obs))
-    cdf_left = np.true_divide(cdf_left, len(obs))
-    cdf_right = np.true_divide(cdf_right, len(obs))
-    """
-
     # now we compute the pdf (the derivative of the cdf)
-    dy = cdf_right - cdf_left
-    pdf_obs_x = np.true_divide(dy, actual_dx)
+    dy_shift = counts_shift
+    dx_shift = x_vector_shift[1:] - x_vector_shift[:-1]
+    pdf_obs_x = np.true_divide(dy_shift, dx_shift)
 
     return (cdf_x, pdf_obs_x)
 
@@ -158,7 +145,7 @@ def group_t(time_interval, pattern):
             current_pos+=size_of_blocks
     return np.array(temp)
 
-def compute_IICR_n_islands(n, M, t, s=1):
+def compute_IICR_n_islands(n, M, t, s=True):
     # This method evaluates the lambda function in a vector
     # of time values t.
     # If 's' is True we are in the case when two individuals where
@@ -170,7 +157,6 @@ def compute_IICR_n_islands(n, M, t, s=1):
     delta = (1+n*gamma)**2 - 4*gamma
     alpha = 0.5*(1+n*gamma + np.sqrt(delta))
     beta =  0.5*(1+n*gamma - np.sqrt(delta))
-    c = np.true_divide(gamma, beta-alpha)
 
     # Now we evaluate
     x_vector = t
@@ -255,25 +241,27 @@ if __name__ == "__main__":
     with open('parameters.json') as json_params:
         p = json.load(json_params)
     
+    times_vector = []
     if p["custom_x_vector"]["set_custom_xvector"] == 0:
-            start = p["computation_parameters"]["start"]
-            end = p["computation_parameters"]["end"]
-            number_of_values = p["computation_parameters"]["number_of_values"]
-            vector_type = p["computation_parameters"]["x_vector_type"]
-            t_vector = compute_t_vector(start, end, number_of_values, vector_type)
-    
-    pattern = p["computation_parameters"]["pattern"]
+        start = p["computation_parameters"]["start"]
+        end = p["computation_parameters"]["end"]
+        number_of_values = p["computation_parameters"]["number_of_values"]
+        vector_type = p["computation_parameters"]["x_vector_type"]
+        t_vector = compute_t_vector(start, end, number_of_values, vector_type)
+        pattern = p["computation_parameters"]["pattern"]
+        times_vector = group_t(t_vector, pattern)
+    else:
+        times_vector = np.array(p["custom_x_vector"]["x_vector"])
+
     empirical_densities = []
     empirical_histories = []
-    times_vector = group_t(t_vector, pattern)
-    dx = p["computation_parameters"]["dx"]
     # Do n independent simulations     
     for i in range(len(p["scenarios"])):
         ms_full_cmd = os.path.join(p["path2ms"], p["scenarios"][i]["ms_command"])
         obs = generate_MS_tk(ms_full_cmd)
         obs = 2*np.array(obs) # Given that in ms time is scaled to 4N0 and 
         # our model scales times to 2N0, we multiply the output of MS by 2.
-        (F_x, f_x) = compute_empirical_dist(obs, times_vector, dx)
+        (F_x, f_x) = compute_empirical_dist(obs, times_vector)
         empirical_densities.append(np.true_divide(np.array(f_x), sum(np.array(f_x))))
         F_x = np.array(F_x)
         x = times_vector
@@ -288,8 +276,6 @@ if __name__ == "__main__":
         
         empirical_lambda = factor * np.true_divide(len(obs)-F_x, f_x)
         empirical_histories.append((x, empirical_lambda))
-    # empirical_lambda = np.true_divide((1-F_x[:-1])*(x[1:]-x[:-1]), 
-    #                                  F_x[1:]-F_x[:-1])
 
     # Do the plot    
     fig = plt.figure()
@@ -299,14 +285,18 @@ if __name__ == "__main__":
     g_time = p["scale_params"]["generation_time"]
     for i in range(len(empirical_histories)):
         (x, empirical_lambda) = empirical_histories[i]
-        x[0] = float(x[1])/5 # this is for avoiding to have x[0]=0 in a logscale
+        
+        # Avoiding to have x[0]=0 in a logscale
+        if x[0] == 0:
+            x[0] = float(x[1])/100
+
         linecolor = p["scenarios"][i]["color"]
         line_style = p["scenarios"][i]["linestyle"]
         linewidth = p["scenarios"][i]["linewidth"]
         alpha = p["scenarios"][i]["alpha"]
         plot_label = p["scenarios"][i]["label"]
-        ax.step(2 * N0 * g_time*x, N0 * empirical_lambda, color = linecolor,
-                ls=line_style, linewidth=linewidth, where='post', alpha=alpha, label=plot_label)
+        ax.plot(2 * N0 * g_time*x, N0 * empirical_lambda, color = linecolor,
+                ls=line_style, linewidth=linewidth, drawstyle='steps-post', alpha=alpha, label=plot_label)
     
     # Draw the vertical lines (if specifyed)
     for vl in p["vertical_lines"]:
@@ -332,7 +322,9 @@ if __name__ == "__main__":
         for i in range(len(p["theoretical_IICR_nisland"])):
             n = p["theoretical_IICR_nisland"][i]["n"]
             M = p["theoretical_IICR_nisland"][i]["M"]
-            theoretical_IICR_list.append(compute_IICR_n_islands(n, M, t_k, 1))
+            same_island = p["theoretical_IICR_nisland"][i]["sampling_same_island"]
+            theoretical_IICR_list.append(compute_IICR_n_islands(n, M, t_k, 
+                                                                same_island))
             
         # Plotting the theoretical IICR
         for i in range(len(p["theoretical_IICR_nisland"])):
@@ -346,15 +338,15 @@ if __name__ == "__main__":
     
     ax.set_xlabel('Time (in years)')
     ax.set_ylabel(r'Instantaneous Coalescence rates $\lambda(t)$')
+    if p["plot_params"].has_key("y_scale"):
+        if p["plot_params"]["y_scale"] == "log":
+            ax.set_yscale('log')
     ax.set_xscale('log')
-    
     plt.legend(loc='best')
     [x_a, x_b, y_a, y_b] = p["plot_params"]["plot_limits"]
     plt.xlim(x_a, x_b)
     plt.ylim(y_a, y_b)
     plt.show()
-    
-    #fig.savefig('./plot.png', dpi=300)
     
     # Plotting the densities
     if p.has_key("plot_densities"):
