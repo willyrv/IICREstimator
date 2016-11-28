@@ -54,7 +54,8 @@
   "plot_params":{
   "plot_theor_IICR": 1,
   "plot_real_ms_history": 0,
-  "plot_limits": [1e2, 1e6, 0, 2e4]
+  "plot_limits": [1e2, 1e6, 0, 2e4],
+  "plot_title": "IICR example"
   },
   "number_of_repetitions": {
   "n_rep": 1

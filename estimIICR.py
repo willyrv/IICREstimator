@@ -346,6 +346,8 @@ if __name__ == "__main__":
     [x_a, x_b, y_a, y_b] = p["plot_params"]["plot_limits"]
     plt.xlim(x_a, x_b)
     plt.ylim(y_a, y_b)
+    if p["plot_params"].has_key("plot_title"):
+      ax.set_title(p["plot_params"]["plot_title"])
     plt.show()
     
     # Plotting the densities
