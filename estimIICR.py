@@ -335,7 +335,20 @@ if __name__ == "__main__":
             plot_label = p["theoretical_IICR_nisland"][i]["label"]
             ax.plot(2 * N0 * g_time * t_k, N0 * theoretical_IICR_list[i],
                 color=linecolor, ls=line_style, alpha=alpha, label=plot_label)
-    
+
+    # Plotting constant piecewise functions (if any)
+    if p.has_key("peicewise_constant_functions"):
+        for f in p["peicewise_constant_functions"]:
+            x = f["x"]
+            y = f["y"]
+            plot_label = f["label"]
+            linecolor = f["color"]
+            line_style = f["linestyle"]
+            line_width = f["linewidth"]
+            line_alpha = f["alpha"]
+            ax.step(x, y, where='post', color=linecolor, ls=line_style, linewidth=line_width,
+                    alpha=line_alpha, label=plot_label)
+
     ax.set_xlabel('Time (in years)')
     ax.set_ylabel(r'Instantaneous Coalescence rates $\lambda(t)$')
     if p["plot_params"].has_key("y_scale"):
@@ -349,7 +362,6 @@ if __name__ == "__main__":
     if p["plot_params"].has_key("plot_title"):
       ax.set_title(p["plot_params"]["plot_title"])
     plt.show()
-    
     # Plotting the densities
     if p.has_key("plot_densities"):
         if len(p["plot_densities"]["densities_to_plot"])>0:

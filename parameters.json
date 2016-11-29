@@ -36,6 +36,16 @@
     "alpha": 0.5    
     }
   ],
+  "peicewise_constant_functions":[
+    {"x":[0, 10000, 100000], 
+    "y":[5000, 12000, 12000], 
+    "label":"testing piecwise function",
+    "color":"k",
+    "linestyle": "-",
+    "linewidth": 1,
+    "alpha": 0.5 
+    }
+  ],  
   "computation_parameters" : {
     "x_vector_type": "log",
     "start": 0,
