@@ -299,6 +299,30 @@ def plotJson(jsonFilename, ax):
       ax.set_title(p["plot_params"]["plot_title"])
     return ax
     # plt.show()
+    
+def get_PSMC_IICR(filename):
+    a = open(filename, 'r')
+    result = a.read()
+    a.close()
+
+    # getting the time windows and the lambda values
+    last_block = result.split('//\n')[-2]
+    last_block = last_block.split('\n')
+    time_windows = []
+    estimated_lambdas = []
+    for line in last_block:
+        if line[:2]=='RS':
+            time_windows.append(float(line.split('\t')[2]))
+            estimated_lambdas.append(float(line.split('\t')[3]))
+
+
+    # getting the estimations of theta and N0
+    result = result.split('PA\t') # The 'PA' lines contain the estimated lambda values
+    result = result[-1].split('\n')[0]
+    result = result.split(' ')
+    #theta = float(result[1])
+    #N0 = theta/(4*args.mutation_rate)/args.bin_size
+    return(time_windows, estimated_lambdas)
 
 
 if __name__ == "__main__":
@@ -347,6 +371,17 @@ if __name__ == "__main__":
     
     N0 = p["scale_params"]["N0"]
     g_time = p["scale_params"]["generation_time"]
+    if "use_real_data" in p:
+        (t_real_data, IICR_real_data) = get_PSMC_IICR(p["use_real_data"]["psmc_results_file"])
+        t_real_data = np.array(t_real_data)
+        IICR_real_data = np.array(IICR_real_data)
+        plot_label = p["use_real_data"]["label"]
+        linecolor = p["use_real_data"]["color"]
+        line_style = p["use_real_data"]["linestyle"]
+        linewidth = p["use_real_data"]["linewidth"]
+        alpha = p["use_real_data"]["alpha"]
+        ax.plot(2 * N0 * g_time * t_real_data, N0 * IICR_real_data, color = linecolor,
+                ls=line_style, linewidth=linewidth, drawstyle='steps-post', alpha=alpha, label=plot_label)
     for i in range(len(empirical_histories)):
         (x, empirical_lambda) = empirical_histories[i]
         
