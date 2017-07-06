@@ -372,16 +372,18 @@ if __name__ == "__main__":
     N0 = p["scale_params"]["N0"]
     g_time = p["scale_params"]["generation_time"]
     if "use_real_data" in p:
-        (t_real_data, IICR_real_data) = get_PSMC_IICR(p["use_real_data"]["psmc_results_file"])
-        t_real_data = np.array(t_real_data)
-        IICR_real_data = np.array(IICR_real_data)
-        plot_label = p["use_real_data"]["label"]
-        linecolor = p["use_real_data"]["color"]
-        line_style = p["use_real_data"]["linestyle"]
-        linewidth = p["use_real_data"]["linewidth"]
-        alpha = p["use_real_data"]["alpha"]
-        ax.plot(2 * N0 * g_time * t_real_data, N0 * IICR_real_data, color = linecolor,
+        for d in p["use_real_data"]:
+            (t_real_data, IICR_real_data) = get_PSMC_IICR(d["psmc_results_file"])
+            t_real_data = np.array(t_real_data)
+            IICR_real_data = np.array(IICR_real_data)
+            plot_label = d["label"]
+            linecolor = d["color"]
+            line_style = d["linestyle"]
+            linewidth = d["linewidth"]
+            alpha = d["alpha"]
+            ax.plot(2 * N0 * g_time * t_real_data, N0 * IICR_real_data, color = linecolor,
                 ls=line_style, linewidth=linewidth, drawstyle='steps-post', alpha=alpha, label=plot_label)
+                
     for i in range(len(empirical_histories)):
         (x, empirical_lambda) = empirical_histories[i]
         

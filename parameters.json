@@ -1,27 +1,27 @@
 {
   "path2ms" : "./",
-  "use_real_data" : {
-    "psmc_results_file" : "experiment_1.psmc",
+  "use_real_data" : [{
+    "psmc_results_file" : "sim-YH.psmc",
     "label":"IICR from real data",
-    "color": "k",
+    "color": "r",
+    "linestyle": "-",
+    "linewidth": 1,
+    "alpha": 1  
+  }],
+  "scenarios" : [
+  {"ms_command":"ms 2 1000000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
+    "label":"n islands. n=10 M=1",
+    "color": "g",
     "linestyle": ":",
     "linewidth": 1,
-    "alpha": 0.5  
-  },
-  "scenarios" : [
-    {"ms_command":"ms 2 1000000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
-    "label":"10 islands, sample_size 2, same_island",
-    "color": "g",
-    "linestyle": "-",
-    "linewidth": 1,
-    "alpha": 0.5
+    "alpha": 1
     },
-    {"ms_command":"ms 2 1000000 -T -L -I 10 1 1 0 0 0 0 0 0 0 0 1",
-    "label":"10 islands, sample_size 2, different islands",
+    {"ms_command":"ms 2 1000000 -T -L",
+    "label":"constant history",
     "color": "b",
-    "linestyle": "-",
+    "linestyle": ":",
     "linewidth": 1,
-    "alpha": 0.5
+    "alpha": 1
     }
   ],
   "theoretical_IICR_nisland" : [
@@ -45,14 +45,6 @@
     }
   ],
   "peicewise_constant_functions":[
-    {"x":[0, 10000, 100000], 
-    "y":[5000, 12000, 12000], 
-    "label":"testing piecwise function",
-    "color":"k",
-    "linestyle": "-",
-    "linewidth": 1,
-    "alpha": 0.5 
-    }
   ],  
   "computation_parameters" : {
     "x_vector_type": "log",
@@ -70,9 +62,9 @@
   "generation_time": 25
   },
   "plot_params":{
-    "plot_theor_IICR": 1,
+    "plot_theor_IICR": 0,
     "plot_real_ms_history": 0,
-    "plot_limits": [1e2, 1e6, 0, 2e4],
+    "plot_limits": [1e2, 1e6, 0, 0.8e4],
     "plot_title": "IICR example",
     "plot_xlabel": "time ",
     "plot_ylabel": "IICR"
@@ -80,9 +72,9 @@
   "number_of_repetitions": {
   "n_rep": 1
   },
-  "vertical_lines":[1, 2, 1000, 2000, 5000],
+  "vertical_lines":[],
   "plot_densities": {
-  "densities_to_plot": [0],
+  "densities_to_plot": [],
   "x_lim": [-0.05, 2],
   "y_lim": [0, 0.5]
   }
