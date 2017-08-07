@@ -1,7 +1,7 @@
 {
   "path2ms" : "./",
   "use_real_data" : [{
-    "psmc_results_file" : "sim-YH.psmc",
+    "psmc_results_file" : "experiment_1.psmc",
     "label":"IICR from real data",
     "color": "r",
     "linestyle": "-",
