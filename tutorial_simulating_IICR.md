@@ -146,5 +146,5 @@ python ./estimIICR.py ./parameters_tutorial.json
 
 ### Now is your turn
 
-Go to the [supplementary file](https://static-content.springer.com/esm/art%3A10.1038%2Fs41437-017-0005-6/MediaObjects/41437_2017_5_MOESM1_ESM.pdf) of the Chikhi et al 2018 paper and use the given ms commands in order to reproduce the plots of the paper. The ms commands are in section 4 (page 10) of the pdf document.
+Go to the [supplementary file](https://static-content.springer.com/esm/art%3A10.1038%2Fs41437-017-0005-6/MediaObjects/41437_2017_5_MOESM1_ESM.pdf) of the Chikhi et al 2018 paper and use the given ms commands in order to reproduce the plots of the paper. The ms commands start in section 4 (page 10) of the pdf document.
 
