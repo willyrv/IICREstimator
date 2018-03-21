@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import json
 import re
 from scipy import misc
+import argparse
 
 def generate_MS_tk(ms_command):
     # Simulate T2 values using MS.
@@ -326,7 +327,11 @@ def get_PSMC_IICR(filename):
 
 
 if __name__ == "__main__":
-    with open('parameters.json') as json_params:
+    parser = argparse.ArgumentParser(description='Simulate T2 values with ms then plot the IICR')
+    parser.add_argument('params_file', type=str,
+                    help='the filename of the parameters')
+    args = parser.parse_args()
+    with open(args.params_file) as json_params:
         p = json.load(json_params)
     
     times_vector = []

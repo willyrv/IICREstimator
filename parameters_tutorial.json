@@ -1,0 +1,55 @@
+{
+  "path2ms" : "./",
+  "scenarios" : [
+    {"ms_command":"ms 2 1000000 -T -L,
+    "label":"constant size",
+    "color": "b",
+    "linestyle": ":",
+    "linewidth": 1,
+    "alpha": 1
+    }
+  ],
+  "theoretical_IICR_nisland" : [
+    {"n": 10,
+    "M": 1,
+    "sampling_same_island": 1,
+    "label": "theoretical IICR T2 n10M1",
+    "color": "k",
+    "linestyle": "-",
+    "linewidth": 1,
+    "alpha": 0.5    
+    }
+  ],
+  "computation_parameters" : {
+    "x_vector_type": "log",
+    "start": 0,
+    "end": 100,
+    "number_of_values": 64,
+    "pattern": "4*1+25*2+4+6"
+    },
+  "custom_x_vector": {
+  "set_custom_xvector": 0,
+  "x_vector": 0
+  },
+  "scale_params":{
+  "N0": 530,
+  "generation_time": 25
+  },
+  "plot_params":{
+    "plot_theor_IICR": 1,
+    "plot_real_ms_history": 0,
+    "plot_limits": [1e2, 1e6, 0, 2e4],
+    "plot_title": "IICR example",
+    "plot_xlabel": "time ",
+    "plot_ylabel": "IICR(t)"
+  },
+  "number_of_repetitions": {
+  "n_rep": 1
+  },
+  "vertical_lines":[],
+  "plot_densities": {
+  "densities_to_plot": [],
+  "x_lim": [-0.05, 2],
+  "y_lim": [0, 0.5]
+  }
+}
