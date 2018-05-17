@@ -1,23 +1,8 @@
 {
   "path2ms" : "./",
-  "use_real_data" : [{
-    "psmc_results_file" : "experiment_1.psmc",
-    "label":"IICR from real data",
-    "color": "r",
-    "linestyle": "-",
-    "linewidth": 1,
-    "alpha": 1  
-  }],
   "scenarios" : [
-  {"ms_command":"ms 2 1000000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
-    "label":"n islands. n=10 M=1",
-    "color": "g",
-    "linestyle": ":",
-    "linewidth": 1,
-    "alpha": 1
-    },
     {"ms_command":"ms 2 1000000 -T -L",
-    "label":"constant history",
+    "label":"constant size",
     "color": "b",
     "linestyle": ":",
     "linewidth": 1,
@@ -33,19 +18,8 @@
     "linestyle": "-",
     "linewidth": 1,
     "alpha": 0.5    
-    },
-    {"n": 10,
-    "M": 1,
-    "sampling_same_island": 0,
-    "label": "theoretical IICR T2 n5M1",
-    "color": "k",
-    "linestyle": "-",
-    "linewidth": 1,
-    "alpha": 0.5    
     }
   ],
-  "peicewise_constant_functions":[
-  ],  
   "computation_parameters" : {
     "x_vector_type": "log",
     "start": 0,
@@ -64,10 +38,10 @@
   "plot_params":{
     "plot_theor_IICR": 0,
     "plot_real_ms_history": 0,
-    "plot_limits": [1e2, 1e6, 0, 0.8e4],
+    "plot_limits": [1e2, 1e6, 0, 8e3],
     "plot_title": "IICR example",
     "plot_xlabel": "time ",
-    "plot_ylabel": "IICR"
+    "plot_ylabel": "IICR(t)"
   },
   "number_of_repetitions": {
   "n_rep": 1
