@@ -406,7 +406,7 @@ if __name__ == "__main__":
     
     # Draw the vertical lines (if specifyed)
     for vl in p["vertical_lines"]:
-      ax.axvline(vl, color='k', ls='--')
+      ax.axvline(4*N0*vl, color='k', ls='--')
       
     # Plot the real history (if commanded)
     if p["plot_params"]["plot_real_ms_history"]:
