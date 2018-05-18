@@ -321,9 +321,9 @@ def get_PSMC_IICR(filename):
     result = result.split('PA\t') # The 'PA' lines contain the estimated lambda values
     result = result[-1].split('\n')[0]
     result = result.split(' ')
-    #theta = float(result[1])
+    theta = float(result[1])
     #N0 = theta/(4*args.mutation_rate)/args.bin_size
-    return(time_windows, estimated_lambdas)
+    return(time_windows, estimated_lambdas, theta)
 
 
 if __name__ == "__main__":
@@ -378,15 +378,15 @@ if __name__ == "__main__":
     g_time = p["scale_params"]["generation_time"]
     if "use_real_data" in p:
         for d in p["use_real_data"]:
-            (t_real_data, IICR_real_data) = get_PSMC_IICR(d["psmc_results_file"])
-            t_real_data = np.array(t_real_data)
-            IICR_real_data = np.array(IICR_real_data)
+            (t_real_data, IICR_real_data, theta) = get_PSMC_IICR(d["psmc_results_file"])
+            t_real_data = np.array(t_real_data) * theta
+            IICR_real_data = np.array(IICR_real_data) * theta
             plot_label = d["label"]
             linecolor = d["color"]
             line_style = d["linestyle"]
             linewidth = d["linewidth"]
             alpha = d["alpha"]
-            ax.plot(2 * N0 * g_time * t_real_data, N0 * IICR_real_data, color = linecolor,
+            ax.plot(t_real_data, IICR_real_data, color = linecolor,
                 ls=line_style, linewidth=linewidth, drawstyle='steps-post', alpha=alpha, label=plot_label)
                 
     for i in range(len(empirical_histories)):

@@ -9,16 +9,9 @@
     "alpha": 1  
   }],
   "scenarios" : [
-  {"ms_command":"ms 2 1000000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
+  {"ms_command":"ms 2 1000 -T -L -I 10 2 0 0 0 0 0 0 0 0 0 1",
     "label":"n islands. n=10 M=1",
     "color": "g",
-    "linestyle": ":",
-    "linewidth": 1,
-    "alpha": 1
-    },
-    {"ms_command":"ms 2 1000000 -T -L",
-    "label":"constant history",
-    "color": "b",
     "linestyle": ":",
     "linewidth": 1,
     "alpha": 1
@@ -58,13 +51,13 @@
   "x_vector": 0
   },
   "scale_params":{
-  "N0": 530,
-  "generation_time": 25
+  "N0": 0.01,
+  "generation_time": 1
   },
   "plot_params":{
     "plot_theor_IICR": 0,
     "plot_real_ms_history": 0,
-    "plot_limits": [1e2, 1e6, 0, 0.8e4],
+    "plot_limits": [1e-4, 1, 0, 0.5],
     "plot_title": "IICR example",
     "plot_xlabel": "time ",
     "plot_ylabel": "IICR"
