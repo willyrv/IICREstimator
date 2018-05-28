@@ -70,5 +70,6 @@
   "densities_to_plot": [],
   "x_lim": [-0.05, 2],
   "y_lim": [0, 0.5]
-  }
+  },
+  "save_IICR_as_file":1
 }

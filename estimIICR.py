@@ -403,10 +403,20 @@ if __name__ == "__main__":
         plot_label = p["scenarios"][i]["label"]
         ax.plot(2 * N0 * g_time*x, N0 * empirical_lambda, color = linecolor,
                 ls=line_style, linewidth=linewidth, drawstyle='steps-post', alpha=alpha, label=plot_label)
-    
+
+    # Save IICR functions to a file (one line for times and one line for IICR values)
+    if "save_IICR_as_file" in p:
+        if p["save_IICR_as_file"]:
+            for i in range(len(empirical_histories)):
+                (x, empirical_lambda) = empirical_histories[i]
+                with open("./IICR_{}_text_file.txt".format(i), "w") as f:
+                    x2write = [str(2 * N0 * g_time * value) for value in x]
+                    IICR2write = [str(N0 * value) for value in empirical_lambda]
+                    f.write("{}\n".format(" ".join(x2write)))
+                    f.write("{}\n".format(" ".join(IICR2write)))
     # Draw the vertical lines (if specifyed)
     for vl in p["vertical_lines"]:
-      ax.axvline(4*N0*vl, color='k', ls='--')
+      ax.axvline(4 * N0 * g_time * vl, color='k', ls='--')
       
     # Plot the real history (if commanded)
     if p["plot_params"]["plot_real_ms_history"]:
