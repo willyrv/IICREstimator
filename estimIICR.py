@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 import re
-from scipy import misc
+from scipy.special import comb
 import argparse
 
 def generate_MS_tk(ms_command):
@@ -80,7 +80,7 @@ def compute_empirical_dist(obs, x_vector=''):
     # by default x_vector is computed as a function of the data
     # by default the differences 'dx' are a vector 
 
-    if x_vector == '':
+    if len(x_vector) == 0:
         actual_x_vector = np.arange(0, max(obs)+0.1, 0.1) 
 
     elif x_vector[-1]<=max(obs): # extend the vector to cover all the data
@@ -210,7 +210,7 @@ def plotJson(jsonFilename, ax):
         # Parsing the ms command for getting the sample size
         ms_command = p["scenarios"][i]["ms_command"]
         sample_size = int(ms_command.split("ms ")[1].split(" ")[0])
-        factor = misc.comb(sample_size, 2)
+        factor = comb(sample_size, 2)
         
         empirical_lambda = factor * np.true_divide(len(obs)-F_x, f_x)
         empirical_histories.append((x, empirical_lambda))
@@ -365,7 +365,7 @@ if __name__ == "__main__":
         # Parsing the ms command for getting the sample size
         ms_command = p["scenarios"][i]["ms_command"]
         sample_size = int(ms_command.split("ms ")[1].split(" ")[0])
-        factor = misc.comb(sample_size, 2)
+        factor = comb(sample_size, 2)
         
         empirical_lambda = factor * np.true_divide(len(obs)-F_x, f_x)
         empirical_histories.append((x, empirical_lambda))
