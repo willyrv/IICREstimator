@@ -329,8 +329,8 @@ def plotJson(jsonFilename, ax):
                 color=linecolor, ls=line_style, alpha=alpha, label=plot_label)
 
     # Plotting constant piecewise functions (if any)
-    if "peicewise_constant_functions" in p:
-        for f in p["peicewise_constant_functions"]:
+    if "piecewise_constant_functions" in p:
+        for f in p["piecewise_constant_functions"]:
             x = f["x"]
             y = f["y"]
             plot_label = f["label"]
@@ -376,7 +376,6 @@ def get_PSMC_IICR(filename):
     result = result[-1].split('\n')[0]
     result = result.split(' ')
     theta = float(result[1])
-    #N0 = theta/(4*args.mutation_rate)/args.bin_size
     return(time_windows, estimated_lambdas, theta)
 
 if __name__ == "__main__":
@@ -432,8 +431,9 @@ if __name__ == "__main__":
     if "use_real_data" in p:
         for d in p["use_real_data"]:
             (t_real_data, IICR_real_data, theta) = get_PSMC_IICR(d["psmc_results_file"])
-            t_real_data = np.array(t_real_data) * theta
-            IICR_real_data = np.array(IICR_real_data) * theta
+            thisN0 = theta / (4.0 * d["mu"] * d["binsize"])
+            t_real_data = np.array(t_real_data) * 2.0 * thisN0 * g_time
+            IICR_real_data = np.array(IICR_real_data) * thisN0
             plot_label = d["label"]
             linecolor = d["color"]
             line_style = d["linestyle"]
@@ -504,8 +504,8 @@ if __name__ == "__main__":
                 color=linecolor, ls=line_style, alpha=alpha, label=plot_label)
 
     # Plotting constant piecewise functions (if any)
-    if "peicewise_constant_functions" in p:
-        for f in p["peicewise_constant_functions"]:
+    if "piecewise_constant_functions" in p:
+        for f in p["piecewise_constant_functions"]:
             x = f["x"]
             y = f["y"]
             plot_label = f["label"]

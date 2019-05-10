@@ -1,0 +1,73 @@
+{
+    "path2ms": "",
+    "use_real_data": [
+        {
+            "psmc_results_file": "./human/French_upper.psmc",
+            "mu": 1.25e-8,
+            "binsize": 100,
+            "label": "Human IICR",
+            "color": "r",
+            "linestyle": "-",
+            "linewidth": 1,
+            "alpha": 1
+        }
+    ],
+    "scenarios": [],
+    "theoretical_IICR_nisland": [
+        {
+            "n": 10,
+            "M": [0.55, 1.0, 4.0, 0.55, 0.85],
+            "tau": [0, 6, 9, 36, 95],
+            "size": [1.0, 1.0, 1.0, 1.0, 1.0],
+            "sampling_same_island": 1,
+            "label": "Theoretical IICR",
+            "color": "k",
+            "linestyle": "-",
+            "linewidth": 1,
+            "alpha": 0.5
+        }
+    ],
+    "computation_parameters": {
+        "x_vector_type": "log",
+        "start": 0,
+        "end": 100,
+        "number_of_values": 64,
+        "pattern": "4*1+25*2+4+6"
+    },
+    "custom_x_vector": {
+        "set_custom_xvector": 0,
+        "x_vector": 0
+    },
+    "scale_params": {
+        "N0": 1276,
+        "generation_time": 25
+    },
+    "plot_params": {
+        "plot_theor_IICR": 1,
+        "plot_real_ms_history": 0,
+        "plot_limits": [
+            1e4,
+            1e7,
+            0,
+            5e4
+        ],
+        "plot_title": "Handfitting the human IICR",
+        "plot_xlabel": "Time",
+        "plot_ylabel": "IICR"
+    },
+    "number_of_repetitions": {
+        "n_rep": 1
+    },
+    "vertical_lines": [],
+    "plot_densities": {
+        "densities_to_plot": [],
+        "x_lim": [
+            -0.05,
+            2
+        ],
+        "y_lim": [
+            0,
+            0.5
+        ]
+    }
+}
