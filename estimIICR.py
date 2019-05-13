@@ -56,12 +56,12 @@ def compute_real_history_from_ms_command(ms_command, N0):
         N_k = [N0]+[N0*float(alpha) for alpha in alpha_k]
         return ('-eN', t_k, N_k)
         # print 'case 1'
-    # Case of exponential grow
+    # Case of exponential growth
     elif ms_command.__contains__('G'):
         alpha = float(msc[msc.index('-G') + 1])
         T = float(msc[msc.index('-G') + 3])
         return ('ExponGrow', [alpha, T, N0])
-        # print 'exponnential grow'
+        # print 'exponential growth'
     # StSI case
     elif ms_command.__contains__('-I'):
         n = int(msc[msc.index('-I') + 1])
@@ -145,7 +145,43 @@ def group_t(time_interval, pattern):
             current_pos+=size_of_blocks
     return np.array(temp)
 
-def compute_IICR_n_islands(n, M, t, s=True):
+def is_array_like(obj, string_is_array = False, tuple_is_array = True):
+    result = hasattr(obj, "__len__") and hasattr(obj, '__getitem__') 
+    if result and not string_is_array and isinstance(obj, str):
+        result = False
+    if result and not tuple_is_array and isinstance(obj, tuple):
+        result = False
+    return result
+
+def compute_IICR_n_islands(t, params):
+    n = params["n"]
+    M = params["M"]
+    s = params["sampling_same_island"]
+
+    if(is_array_like(n)):
+        raise TypeError("Having multiple number of islands is not yet supported!")
+
+    if(is_array_like(M)):
+        tau = params["tau"]
+        c = params["size"]
+
+        if(not (is_array_like(tau) or is_array_like(c))):
+            raise TypeError("Both 'tau' and 'size' must be array types!")
+        
+        if(len(M) != len(tau)):
+            raise ValueError("Vectors 'M' and 'tau' must have the same length!")
+        
+        if(tau[0] != 0):
+            raise ValueError("The time of the first event must be 0!")
+
+        if(len(M) != len(c)):
+            raise ValueError("Vectors 'M' and 'size' must have the same length!")
+
+        return compute_piecewise_stationary_IICR_n_islands(n, M, tau, c, t, s)
+    
+    return compute_stationary_IICR_n_islands(n, M, t, s)
+
+def compute_stationary_IICR_n_islands(n, M, t, s=True):
     # This method evaluates the lambda function in a vector
     # of time values t.
     # If 's' is True we are in the case when two individuals where
@@ -170,6 +206,24 @@ def compute_IICR_n_islands(n, M, t, s=True):
     lambda_t = np.true_divide(numerator, denominator)
 
     return lambda_t
+
+def compute_piecewise_stationary_IICR_n_islands(n, M, tau, c, t, s=True):
+    from model import Pnisland
+
+    sampling = []
+    if(s):
+        sampling = [2] + [0] * (n - 1)
+    else:
+        sampling = [1, 1] + [0] * (n - 2)
+
+    scenarios = []
+    for i in range(len(M)):
+        thisdict = {"time" : tau[i], "n": n, "M": M[i], "c": c[i]}
+        scenarios.append(thisdict)
+
+    model_params = {"nbLoci" : 100, "samplingVector" : sampling, "scenario" : scenarios}
+    nsnic = Pnisland(model_params)
+    return nsnic.evaluateIICR(t)
 
 def plotJson(jsonFilename, ax):
     # Do the corresponding plots in a json parameters file
@@ -275,8 +329,8 @@ def plotJson(jsonFilename, ax):
                 color=linecolor, ls=line_style, alpha=alpha, label=plot_label)
 
     # Plotting constant piecewise functions (if any)
-    if "peicewise_constant_functions" in p:
-        for f in p["peicewise_constant_functions"]:
+    if "piecewise_constant_functions" in p:
+        for f in p["piecewise_constant_functions"]:
             x = f["x"]
             y = f["y"]
             plot_label = f["label"]
@@ -322,9 +376,7 @@ def get_PSMC_IICR(filename):
     result = result[-1].split('\n')[0]
     result = result.split(' ')
     theta = float(result[1])
-    #N0 = theta/(4*args.mutation_rate)/args.bin_size
     return(time_windows, estimated_lambdas, theta)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Simulate T2 values with ms then plot the IICR')
@@ -379,8 +431,9 @@ if __name__ == "__main__":
     if "use_real_data" in p:
         for d in p["use_real_data"]:
             (t_real_data, IICR_real_data, theta) = get_PSMC_IICR(d["psmc_results_file"])
-            t_real_data = np.array(t_real_data) * theta
-            IICR_real_data = np.array(IICR_real_data) * theta
+            thisN0 = theta / (4.0 * d["mu"] * d["binsize"])
+            t_real_data = np.array(t_real_data) * 2.0 * thisN0 * g_time
+            IICR_real_data = np.array(IICR_real_data) * thisN0
             plot_label = d["label"]
             linecolor = d["color"]
             line_style = d["linestyle"]
@@ -414,7 +467,8 @@ if __name__ == "__main__":
                     IICR2write = [str(N0 * value) for value in empirical_lambda]
                     f.write("{}\n".format(" ".join(x2write)))
                     f.write("{}\n".format(" ".join(IICR2write)))
-    # Draw the vertical lines (if specifyed)
+
+    # Draw the vertical lines (if specified)
     for vl in p["vertical_lines"]:
       ax.axvline(4 * N0 * g_time * vl, color='k', ls='--')
       
@@ -436,11 +490,8 @@ if __name__ == "__main__":
         t_k = np.logspace(1, T_max, 1000)
         t_k = np.true_divide(t_k, 2 * N0 * g_time)
         for i in range(len(p["theoretical_IICR_nisland"])):
-            n = p["theoretical_IICR_nisland"][i]["n"]
-            M = p["theoretical_IICR_nisland"][i]["M"]
-            same_island = p["theoretical_IICR_nisland"][i]["sampling_same_island"]
-            theoretical_IICR_list.append(compute_IICR_n_islands(n, M, t_k, 
-                                                                same_island))
+            params = p["theoretical_IICR_nisland"][i]
+            theoretical_IICR_list.append(compute_IICR_n_islands(t_k, params))
             
         # Plotting the theoretical IICR
         for i in range(len(p["theoretical_IICR_nisland"])):
@@ -453,8 +504,8 @@ if __name__ == "__main__":
                 color=linecolor, ls=line_style, alpha=alpha, label=plot_label)
 
     # Plotting constant piecewise functions (if any)
-    if "peicewise_constant_functions" in p:
-        for f in p["peicewise_constant_functions"]:
+    if "piecewise_constant_functions" in p:
+        for f in p["piecewise_constant_functions"]:
             x = f["x"]
             y = f["y"]
             plot_label = f["label"]
