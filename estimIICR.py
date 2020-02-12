@@ -399,11 +399,11 @@ if __name__ == "__main__":
     plt.ylim(y_a, y_b)
     if "plot_title" in p["plot_params"]:
       ax.set_title(p["plot_params"]["plot_title"])
-    if p["plot_params"]["save_figure"]:
+    if ("save_figure" in p["plot_params"]) and p["plot_params"]["save_figure"]:
         fig_name = os.path.splitext(args.params_file)[0]
         plt.savefig("{}.pdf".format(fig_name),
                         format="pdf")      
-    if p["plot_params"]["show_plot"]:
+    if ("show_plot" in p["plot_params"]) and p["plot_params"]["show_plot"]:
         plt.show()
     # Plotting the densities
     if "plot_densities" in p:
