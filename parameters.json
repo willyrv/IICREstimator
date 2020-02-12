@@ -2,6 +2,8 @@
   "path2ms" : "./",
   "use_real_data" : [{
     "psmc_results_file" : "experiment_1.psmc",
+    "mu": 2.5e-8,
+    "binsize": 100,
     "label":"IICR from real data",
     "color": "r",
     "linestyle": "-",
@@ -60,7 +62,9 @@
     "plot_limits": [1e-4, 1, 0, 0.5],
     "plot_title": "IICR example",
     "plot_xlabel": "time ",
-    "plot_ylabel": "IICR"
+    "plot_ylabel": "IICR",
+    "show_plot": 1,
+    "save_figure": 1
   },
   "number_of_repetitions": {
   "n_rep": 1
