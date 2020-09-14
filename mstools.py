@@ -30,10 +30,10 @@ def generate_panmictic_ms(migration_rate, islands):
 	import numpy as np
 	from math import exp
 	
-	iicr = stationary_nisland_iicr(migration_rate, islands)
+	iicr_function = stationary_nisland_iicr(migration_rate, islands)
 
 	time = [10**t for t in np.linspace(-2, 2, 100)]
-	iicr = [iicr(t) for t in time]
+	iicr = [iicr_function(t) for t in time]
 
 	ms_command = ['./scrm', '2', str(ms_seq_simulations), 
 		'-t', str(ms_theta), '-r', str(ms_recombination),
